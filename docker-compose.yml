@@ -7,9 +7,10 @@ services:
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5444/stats_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats_db:5444/stats_db
       - SPRING_DATASOURCE_USER=root
       - SPRING_DATASOURCE_PASSWORD=root
+      - SERVER-PORT=9090
     depends_on:
       - stats-db
 
@@ -32,9 +33,10 @@ services:
 
     environment:
       - STATS-SERVER_URL=http://localhost:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm_db:5432/ewm_db
       - SPRING_DATASOURCE_USER=ewm
       - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER-PORT=8080
     depends_on:
       - ewm-db
       - stats-server
