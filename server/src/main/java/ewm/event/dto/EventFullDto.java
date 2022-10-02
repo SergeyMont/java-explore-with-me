@@ -1,0 +1,27 @@
+package ewm.event.dto;
+
+import ewm.category.dto.CategoryDto;
+import ewm.user.dto.UserShortDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class EventFullDto {
+    private String annotation;
+    private CategoryDto category;
+    private int confirmedRequests;
+    private String createdOn;
+    private String description;
+    private String eventDate;
+    private int id;
+    private UserShortDto initiator;
+    private boolean paid;
+    private int participantLimit;
+    private String publishedOn;
+    private boolean requestModeration;
+    private String state;
+    private String title;
+    private int views;
+    private Location location;
+}
