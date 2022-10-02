@@ -79,7 +79,7 @@ public class RequestService {
                     cancelEvent.setStatus(Status.CANCELED);
                 }
             }
-            Request request = repository.findById(reqId).orElseThrow(()->new ObjectNotFoundException("Запрос не найден"));
+            Request request = repository.findById(reqId).orElseThrow(() -> new ObjectNotFoundException("Запрос не найден"));
             request.setStatus(Status.APPROVED);
             return toRequestDto(request);
         } else throw new AccessException("Достигнуто максимальное количество участников мероприятия");
