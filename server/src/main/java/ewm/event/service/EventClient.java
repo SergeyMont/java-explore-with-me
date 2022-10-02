@@ -1,7 +1,7 @@
 package ewm.event.service;
 
 import ewm.event.client.BaseClient;
-import ewm_stats.model.EndpointHit;
+import ewmstats.model.EndpointHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

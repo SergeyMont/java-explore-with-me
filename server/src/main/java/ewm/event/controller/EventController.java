@@ -6,7 +6,7 @@ import ewm.event.dto.NewEventDto;
 import ewm.event.dto.UpdateEventRequest;
 import ewm.event.service.EventClient;
 import ewm.event.service.EventService;
-import ewm_stats.model.EndpointHit;
+import ewmstats.model.EndpointHit;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

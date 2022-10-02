@@ -11,7 +11,7 @@ import ewm.event.repository.EventRepository;
 import ewm.exceptions.ObjectNotFoundException;
 import ewm.user.dto.UserShortDto;
 import ewm.user.repository.UserRepository;
-import ewm_stats.model.ViewStats;
+import ewmstats.model.ViewStats;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;

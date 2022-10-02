@@ -1,4 +1,4 @@
-package ewm_stats;
+package ewmstats;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

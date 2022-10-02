@@ -1,7 +1,7 @@
-package ewm_stats.server;
+package ewmstats.server;
 
-import ewm_stats.model.EndpointHit;
-import ewm_stats.model.ViewStats;
+import ewmstats.model.EndpointHit;
+import ewmstats.model.ViewStats;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
