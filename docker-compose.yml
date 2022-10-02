@@ -3,7 +3,6 @@ services:
   stats-server:
     build: ./stats
     container_name: stats
-    restart: always
     ports:
       - "9090:9090"
     environment:
@@ -27,7 +26,6 @@ services:
   ewm-service:
     build: ./server
     container_name: server
-    restart: always
     ports:
       - "8080:8080"
 
