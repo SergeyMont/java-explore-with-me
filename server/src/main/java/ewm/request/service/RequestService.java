@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,9 +33,9 @@ public class RequestService {
     public ParticipationRequestDto createRequest(int userId, int eventId) {
         EventFullDto event = eventService.getEventById(eventId);
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
-        if (event.getInitiator().equals(userId)) {
+        if (Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ConflictException("Создатель мероприятия не может быть участником");
-        } else if (!event.getState().equals(State.PUBLISHED)) {
+        } else if (!Objects.equals(event.getState(), State.PUBLISHED.toString())) {
             throw new BadConditionException("Событие уже опубликовано!");
         }
         if (event.getParticipantLimit() == event.getConfirmedRequests()) {
@@ -78,7 +79,7 @@ public class RequestService {
                     cancelEvent.setStatus(Status.CANCELED);
                 }
             }
-            Request request = repository.findById(reqId).get();
+            Request request = repository.findById(reqId).orElseThrow(()->new ObjectNotFoundException("Запрос не найден"));
             request.setStatus(Status.APPROVED);
             return toRequestDto(request);
         } else throw new AccessException("Достигнуто максимальное количество участников мероприятия");
