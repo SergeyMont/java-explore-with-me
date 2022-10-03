@@ -11,7 +11,6 @@ import ewm.event.repository.EventRepository;
 import ewm.exceptions.ObjectNotFoundException;
 import ewm.user.dto.UserShortDto;
 import ewm.user.repository.UserRepository;
-import ewmstats.model.ViewStats;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -77,7 +76,7 @@ public class EventService {
     }
 
     private Event setStatisticViews(Event innerEvent) {
-        innerEvent.setViews(((ViewStats) eventClient.getViews(LocalDateTime.MIN.format(formatter),
+        innerEvent.setViews(((ViewStatsDto) eventClient.getViews(LocalDateTime.MIN.format(formatter),
                 LocalDateTime.now().format(formatter),
                 List.of("/events/{" + innerEvent.getId() + "}"), true).getBody()).getHits());
         return eventRepository.save(innerEvent);

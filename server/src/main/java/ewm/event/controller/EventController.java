@@ -1,12 +1,8 @@
 package ewm.event.controller;
 
-import ewm.event.dto.AdminUpdateEventRequest;
-import ewm.event.dto.EventFullDto;
-import ewm.event.dto.NewEventDto;
-import ewm.event.dto.UpdateEventRequest;
+import ewm.event.dto.*;
 import ewm.event.service.EventClient;
 import ewm.event.service.EventService;
-import ewmstats.model.EndpointHit;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +38,7 @@ public class EventController {
     }
 
     private void saveHit(HttpServletRequest request) {
-        EndpointHit endpointHit = new EndpointHit();
+        EndpointHitDto endpointHit = new EndpointHitDto();
         endpointHit.setUri(request.getRequestURI());
         endpointHit.setApp("ewm-server");
         endpointHit.setIp(request.getRemoteAddr());

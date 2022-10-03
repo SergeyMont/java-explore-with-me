@@ -6,18 +6,18 @@ services:
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats_db:5444/stats_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats_db:5432/stats_db
       - SPRING_DATASOURCE_USER=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SERVER-PORT=9090
     depends_on:
-      - stats-db
+      - stats_db
 
-  stats-db:
+  stats_db:
     image: postgres:14-alpine
     container_name: stats_db
     ports:
-      - "5444:5444"
+      - "5444:5432"
     environment:
       - POSTGRES_DB=stats_db
       - POSTGRES_USER=root
@@ -36,10 +36,10 @@ services:
       - SPRING_DATASOURCE_PASSWORD=password
       - SERVER-PORT=8080
     depends_on:
-      - ewm-db
+      - ewm_db
       - stats-server
 
-  ewm-db:
+  ewm_db:
     image: postgres:14-alpine
     container_name: ewm_db
     ports:

@@ -1,7 +1,7 @@
 package ewm.event.service;
 
 import ewm.event.client.BaseClient;
-import ewmstats.model.EndpointHit;
+import ewm.event.dto.EndpointHitDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -38,7 +38,7 @@ public class EventClient extends BaseClient {
         return get("stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }
 
-    public void saveHit(EndpointHit endpointHit) {
+    public void saveHit(EndpointHitDto endpointHit) {
         post("hit", endpointHit);
     }
 }
