@@ -1,12 +1,11 @@
 package ewm.user;
 
+import ewm.event.EventRating;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @Entity
@@ -17,4 +16,6 @@ public class User {
     private int id;
     private String email;
     private String name;
+    @OneToMany(mappedBy = "user")
+    Set<EventRating> ratings;
 }

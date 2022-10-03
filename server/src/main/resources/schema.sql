@@ -49,3 +49,13 @@ CREATE TABLE IF NOT EXISTS list_events (
     CONSTRAINT FK_LIST_EVENTS_ON_EVENTS FOREIGN KEY (event_id) REFERENCES events (id),
     CONSTRAINT FK_LIST_EVENTS_ON_COMPALATIONS FOREIGN KEY (compilation_id) REFERENCES compilations (id)
     );
+
+CREATE TABLE IF NOT EXISTS rating
+(
+    user_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    rating BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES films (event_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, event_id)
+    );

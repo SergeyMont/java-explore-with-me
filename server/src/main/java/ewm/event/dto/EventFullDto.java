@@ -24,4 +24,5 @@ public class EventFullDto {
     private String title;
     private int views;
     private Location location;
+    private Double rating;
 }
