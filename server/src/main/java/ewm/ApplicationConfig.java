@@ -30,11 +30,11 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public EventClient eventClient(RestTemplateBuilder builder){
-        var restTemplate= builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serviceUrl + API_PREFIX))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build();
+    public EventClient eventClient(RestTemplateBuilder builder) {
+        var restTemplate = builder
+                .uriTemplateHandler(new DefaultUriBuilderFactory(serviceUrl + API_PREFIX))
+                .requestFactory(HttpComponentsClientHttpRequestFactory::new)
+                .build();
         return new EventClient(restTemplate);
     }
 }

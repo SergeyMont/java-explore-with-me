@@ -120,7 +120,8 @@ public class EventService {
         eventFullDto.setCategory(modelMapper.map(innerEvent.getCategory(), CategoryDto.class));
         eventFullDto.setEventDate(innerEvent.getEventDate().format(formatter));
         eventFullDto.setCreatedOn(innerEvent.getCreatedOn().format(formatter));
-        if(innerEvent.getPublishedOn()!=null)eventFullDto.setPublishedOn(innerEvent.getPublishedOn().format(formatter));
+        if (innerEvent.getPublishedOn() != null)
+            eventFullDto.setPublishedOn(innerEvent.getPublishedOn().format(formatter));
         eventFullDto.setInitiator(modelMapper.map(innerEvent.getInitiator(), UserShortDto.class));
         return eventFullDto;
     }

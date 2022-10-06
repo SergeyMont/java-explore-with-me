@@ -46,7 +46,7 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategoryById(int id) {
-        if(categoryRepository.existsById(id)) categoryRepository.deleteById(id);
+        if (categoryRepository.existsById(id)) categoryRepository.deleteById(id);
         else throw new ObjectNotFoundException("Категория не найдена");
     }
 
@@ -57,6 +57,7 @@ public class CategoryService {
     private CategoryDto toCategoryDto(Category category) {
         return modelMapper.map(category, CategoryDto.class);
     }
+
     private void validateUser(Integer userId) {
         if (!userService.isUserCreated(userId)) {
             throw new ObjectNotFoundException("User is not created");

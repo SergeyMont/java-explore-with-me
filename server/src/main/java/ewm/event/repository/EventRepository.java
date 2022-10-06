@@ -26,9 +26,9 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     Event findEventByIdAndInitiator(int id, int initiator);
 
     List<Event> findAllByInitiatorIdInAndStateAndCategoryIdInAndEventDateBetween(List<Integer> initiator,
-                                                                                   State state,
-                                                                                   List<Integer> category,
-                                                                                   LocalDateTime rangeStart,
-                                                                                   LocalDateTime rangeEnd,
-                                                                                   Pageable pageable);
+                                                                                 State state,
+                                                                                 List<Integer> category,
+                                                                                 LocalDateTime rangeStart,
+                                                                                 LocalDateTime rangeEnd,
+                                                                                 Pageable pageable);
 }
