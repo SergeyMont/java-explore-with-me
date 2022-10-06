@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "events")
 public class Event {
     private String annotation;
     @JoinColumn(name = "category_id")
     @ManyToOne
     private Category category;
-    private Integer confirmedRequests;
+    private int confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
     private LocalDateTime eventDate;

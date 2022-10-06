@@ -48,6 +48,5 @@ public class RequestController {
                                                  @PathVariable Integer eventId,
                                                  @PathVariable Integer reqId) {
         return requestService.cancelRequest(userId, eventId, reqId);
-
     }
 }

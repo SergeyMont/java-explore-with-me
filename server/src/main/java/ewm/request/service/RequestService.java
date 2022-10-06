@@ -15,6 +15,7 @@ import ewm.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +31,7 @@ public class RequestService {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
+    @Transactional
     public ParticipationRequestDto createRequest(int userId, int eventId) {
         EventFullDto event = eventService.getEventById(eventId);
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
@@ -55,6 +57,7 @@ public class RequestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ParticipationRequestDto cancelRequest(int requestId) {
         Request request = repository.findById(requestId).orElse(null);
         assert request != null;
@@ -69,6 +72,7 @@ public class RequestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ParticipationRequestDto confirmRequest(int userId, int eventId, int reqId) {
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
         EventFullDto event = eventService.getEventById(eventId);
@@ -81,10 +85,12 @@ public class RequestService {
             }
             Request request = repository.findById(reqId).orElseThrow(() -> new ObjectNotFoundException("Запрос не найден"));
             request.setStatus(Status.APPROVED);
+            repository.save(request);
             return toRequestDto(request);
         } else throw new AccessException("Достигнуто максимальное количество участников мероприятия");
     }
 
+    @Transactional
     public ParticipationRequestDto cancelRequest(int userId, int eventId, int reqId) {
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
         Request request = new Request();

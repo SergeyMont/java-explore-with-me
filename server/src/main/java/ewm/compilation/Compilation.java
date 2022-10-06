@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 @Data
 @Entity
 @NoArgsConstructor
+@Table(name = "compilations")
 public class Compilation {
     @Id
     private int id;

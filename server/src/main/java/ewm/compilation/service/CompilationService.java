@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,18 +33,22 @@ public class CompilationService {
                 .orElseThrow(() -> new ObjectNotFoundException("Подборка не найдена")));
     }
 
+    @Transactional
     public CompilationDto createCompilation(CompilationDto compilationDto) {
         return toCompilationDto(compilationRepository.save(toCompilation(compilationDto)));
     }
 
+    @Transactional
     public CompilationDto updateCompilation(CompilationDto compilationDto) {
         return toCompilationDto(compilationRepository.save(toCompilation(compilationDto)));
     }
 
+    @Transactional
     public void deleteCompilation(int id) {
         compilationRepository.deleteById(id);
     }
 
+    @Transactional
     public CompilationDto addEventToCompilation(int compId, int eventId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new ObjectNotFoundException("Подборка не найдена"));
@@ -55,6 +60,7 @@ public class CompilationService {
         return toCompilationDto(compilationRepository.save(toCompilation(compilationDto)));
     }
 
+    @Transactional
     public CompilationDto deleteEventToCompilation(int compId, int eventId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new ObjectNotFoundException("Подборка не найдена"));
@@ -66,6 +72,7 @@ public class CompilationService {
         return toCompilationDto(compilationRepository.save(toCompilation(compilationDto)));
     }
 
+    @Transactional
     public CompilationDto updateCompilationPin(int compId, boolean pin) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new ObjectNotFoundException("Подборка не найдена"));

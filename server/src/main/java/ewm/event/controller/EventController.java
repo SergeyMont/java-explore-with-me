@@ -89,7 +89,7 @@ public class EventController {
 
     @GetMapping("/admin/events")
     public List<EventFullDto> searchEventAdmin(@RequestParam List<Integer> users,
-                                               @RequestParam List<String> states,
+                                               @RequestParam String states,
                                                @RequestParam List<Integer> categories,
                                                @RequestParam String rangeStart,
                                                @RequestParam String rangeEnd,

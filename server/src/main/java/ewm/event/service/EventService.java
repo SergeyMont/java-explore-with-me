@@ -15,7 +15,9 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,24 +46,24 @@ public class EventService {
                                           int from,
                                           int size) {
         List<Category> categoryList = categoryRepository.findAllById(categories);
-        Pageable pageable = PageRequest.of(from, size);
+        Pageable pageableDate = PageRequest.of(from, size, JpaSort.unsafe("event_date"));
+        Pageable pageableViews = PageRequest.of(from, size, JpaSort.unsafe("views"));
         LocalDateTime dateStart = LocalDateTime.parse(rangeStart.get());
         LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd);
         List<Event> list = new ArrayList<>();
         switch (sort) {
             case EVENT_DATE:
                 list = eventRepository
-                        .findAllByAnnotationDescriptionCategoryEventDateBetweenPaidOrderByEventDate(text,
-                                categoryList, dateStart, dateEnd, paid, pageable);
+                        .findAllEventsCategoryRange(text,
+                                categoryList, dateStart, dateEnd, paid, State.PUBLISHED, pageableDate);
                 break;
             case VIEWS:
                 list = eventRepository
-                        .findAllByAnnotationDescriptionCategoryEventDateBetweenPaidOrderByViews(text,
-                                categoryList, dateStart, dateEnd, paid, pageable);
+                        .findAllEventsCategoryRange(text,
+                                categoryList, dateStart, dateEnd, paid, State.PUBLISHED, pageableViews);
                 break;
         }
         return list.stream()
-                .filter((e) -> e.getState().equals(State.PUBLISHED))
                 .map(this::setStatisticViews)
                 .map(this::getEventFullDto)
                 .collect(Collectors.toList());
@@ -91,6 +93,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public EventFullDto updateEventByUser(int userId, UpdateEventRequest updateEventRequest) {
         Event event = EventMapper.fromUpdateToEvent(updateEventRequest);
         setCategoryStateInitiator(event, updateEventRequest.getCategory(), userId);
@@ -105,6 +108,7 @@ public class EventService {
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден")));
     }
 
+    @Transactional
     public EventFullDto createEventByUser(int userId, NewEventDto newEventDto) {
         Event event = EventMapper.fromNewToEvent(newEventDto);
         setCategoryStateInitiator(event, newEventDto.getCategory(), userId);
@@ -116,7 +120,7 @@ public class EventService {
         eventFullDto.setCategory(modelMapper.map(innerEvent.getCategory(), CategoryDto.class));
         eventFullDto.setEventDate(innerEvent.getEventDate().format(formatter));
         eventFullDto.setCreatedOn(innerEvent.getCreatedOn().format(formatter));
-        eventFullDto.setPublishedOn(innerEvent.getPublishedOn().format(formatter));
+        if(innerEvent.getPublishedOn()!=null)eventFullDto.setPublishedOn(innerEvent.getPublishedOn().format(formatter));
         eventFullDto.setInitiator(modelMapper.map(innerEvent.getInitiator(), UserShortDto.class));
         return eventFullDto;
     }
@@ -126,44 +130,49 @@ public class EventService {
     }
 
     public List<EventFullDto> searchEventByAdmin(List<Integer> users,
-                                                 List<String> states,
+                                                 String states,
                                                  List<Integer> categories,
                                                  String rangeStart,
                                                  String rangeEnd,
                                                  int from,
                                                  int size) {
         Pageable pageable = PageRequest.of(from, size);
-        LocalDateTime dateStart = LocalDateTime.parse(rangeStart);
-        LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd);
-        return eventRepository.findAllByInitiatorIdInAndStateInAndCategoryIdInAndEventDateBetween(users, states,
+        LocalDateTime dateStart = LocalDateTime.parse(rangeStart, formatter);
+        LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd, formatter);
+        return eventRepository.findAllByInitiatorIdInAndStateAndCategoryIdInAndEventDateBetween(users, State.valueOf(states),
                         categories, dateStart, dateEnd, pageable).stream()
                 .map(this::setStatisticViews)
                 .map(this::getEventFullDto)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public EventFullDto updateEventByAdmin(int eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Event event = EventMapper.fromAdminToEvent(adminUpdateEventRequest);
         event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory()).get());
         return getEventFullDto(eventRepository.save(event));
     }
 
+    @Transactional
     public EventFullDto publishEvent(int eventId) {
         Event event = new Event();
         Optional<Event> innerEvent = eventRepository.findById(eventId);
         if (innerEvent.isPresent()) {
             event = innerEvent.get();
             event.setState(State.PUBLISHED);
+            eventRepository.save(event);
         }
         return getEventFullDto(event);
     }
 
+    @Transactional
     public EventFullDto rejectEvent(int eventId) {
         Event event = new Event();
         Optional<Event> innerEvent = eventRepository.findById(eventId);
         if (innerEvent.isPresent()) {
             event = innerEvent.get();
             event.setState(State.CANCELED);
+            eventRepository.save(event);
         }
         return getEventFullDto(event);
     }
