@@ -69,7 +69,6 @@ public class EventService {
         return list.stream()
                 .map(this::setStatisticViews)
                 .map(this::getEventFullDto)
-                //add sort by Rating
                 .sorted(Comparator.comparing(EventFullDto::getRating).reversed())
                 .collect(Collectors.toList());
     }
@@ -128,7 +127,6 @@ public class EventService {
         if (innerEvent.getPublishedOn() != null)
             eventFullDto.setPublishedOn(innerEvent.getPublishedOn().format(formatter));
         eventFullDto.setInitiator(modelMapper.map(innerEvent.getInitiator(), UserShortDto.class));
-        //setup Rating
         eventFullDto.setRating(ratingRepository.getEventRating(innerEvent.getId()));
         return eventFullDto;
     }

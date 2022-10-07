@@ -61,3 +61,12 @@ CREATE TABLE IF NOT EXISTS list_events (
     CONSTRAINT FK_REQUESTS_ON_EVENTS FOREIGN KEY (event_id) REFERENCES events (id),
     CONSTRAINT FK_REQUESTS_ON_USERS FOREIGN KEY (requester_id) REFERENCES users (id)
     );
+
+    CREATE TABLE IF NOT EXISTS rating(
+    user_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    rating BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES films (event_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, event_id)
+    );
