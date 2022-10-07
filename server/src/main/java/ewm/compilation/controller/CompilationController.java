@@ -19,7 +19,7 @@ public class CompilationController {
         return compilationService.getAllCompilation(pinned, from, size);
     }
 
-    @GetMapping("/compilation/{compId}")
+    @GetMapping("/compilations/{compId}")
     public CompilationDto getCompilationById(@PathVariable int compId) {
         return compilationService.getCompilationById(compId);
     }

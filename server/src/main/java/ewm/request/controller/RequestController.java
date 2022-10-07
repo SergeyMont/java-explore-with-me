@@ -1,5 +1,6 @@
 package ewm.request.controller;
 
+import ewm.request.Request;
 import ewm.request.dto.ParticipationRequestDto;
 import ewm.request.service.RequestService;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,8 @@ public class RequestController {
     }
 
     @PostMapping("/{userId}/requests")
-    public ParticipationRequestDto createRequest(@PathVariable Integer userId,
-                                                 @RequestParam Integer eventId) {
+    public Request createRequest(@PathVariable Integer userId,
+                                 @RequestParam Integer eventId) {
         return requestService.createRequest(userId, eventId);
     }
 

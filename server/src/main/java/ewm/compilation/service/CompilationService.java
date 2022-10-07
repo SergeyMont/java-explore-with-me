@@ -67,7 +67,7 @@ public class CompilationService {
         assert compilation != null;
         CompilationDto compilationDto = toCompilationDto(compilation);
         List<Integer> list = compilationDto.getEvents();
-        list.remove(eventId);
+        list.remove((Integer) eventId);
         compilationDto.setEvents(list);
         return toCompilationDto(compilationRepository.save(toCompilation(compilationDto)));
     }

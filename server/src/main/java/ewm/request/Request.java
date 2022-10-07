@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "requests")
 public class Request {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @JoinColumn(name = "event_id")
     @ManyToOne

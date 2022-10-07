@@ -1,7 +1,9 @@
 package ewm.request.service;
 
+import ewm.event.Event;
 import ewm.event.State;
 import ewm.event.dto.EventFullDto;
+import ewm.event.repository.EventRepository;
 import ewm.event.service.EventService;
 import ewm.exceptions.AccessException;
 import ewm.exceptions.BadConditionException;
@@ -11,6 +13,8 @@ import ewm.request.Request;
 import ewm.request.Status;
 import ewm.request.dto.ParticipationRequestDto;
 import ewm.request.repository.RequestRepository;
+import ewm.user.User;
+import ewm.user.repository.UserRepository;
 import ewm.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,14 +30,16 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class RequestService {
     private final RequestRepository repository;
-    private final EventService eventService;
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
     private final UserService userService;
     private final ModelMapper modelMapper;
 
     @Transactional
-    public ParticipationRequestDto createRequest(int userId, int eventId) {
-        EventFullDto event = eventService.getEventById(eventId);
+    public Request createRequest(int userId, int eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
         if (Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ConflictException("Создатель мероприятия не может быть участником");
@@ -43,12 +49,12 @@ public class RequestService {
         if (event.getParticipantLimit() == event.getConfirmedRequests()) {
             throw new AccessException("Количество подтвержденных участников - максимальное");
         }
-        ParticipationRequestDto request = new ParticipationRequestDto();
-        request.setRequester(userId);
-        request.setCreated(String.valueOf(LocalDateTime.now()));
-        request.setStatus(Status.PENDING.toString());
-        request.setEvent(eventId);
-        return toRequestDto(repository.save(toRequest(request)));
+        Request request = new Request();
+        request.setRequester(user);
+        request.setCreated(LocalDateTime.now());
+        request.setStatus(Status.PENDING);
+        request.setEvent(event);
+        return repository.save(request);
     }
 
     public List<ParticipationRequestDto> getAllRequestByUser(int userId) {
@@ -75,7 +81,7 @@ public class RequestService {
     @Transactional
     public ParticipationRequestDto confirmRequest(int userId, int eventId, int reqId) {
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
-        EventFullDto event = eventService.getEventById(eventId);
+        Event event = eventRepository.findById(eventId).orElseThrow();
         if (event.getConfirmedRequests() < event.getParticipantLimit()) {
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             if (event.getConfirmedRequests() == event.getParticipantLimit()) {
@@ -94,7 +100,7 @@ public class RequestService {
     public ParticipationRequestDto cancelRequest(int userId, int eventId, int reqId) {
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
         Request request = new Request();
-        eventService.getEventById(eventId);
+        eventRepository.findById(eventId).orElseThrow();
         if (repository.findById(reqId).isPresent()) {
             request = repository.findById(reqId).get();
             request.setStatus(Status.CANCELED);
