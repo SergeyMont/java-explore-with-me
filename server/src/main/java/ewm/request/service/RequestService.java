@@ -2,9 +2,7 @@ package ewm.request.service;
 
 import ewm.event.Event;
 import ewm.event.State;
-import ewm.event.dto.EventFullDto;
 import ewm.event.repository.EventRepository;
-import ewm.event.service.EventService;
 import ewm.exceptions.AccessException;
 import ewm.exceptions.BadConditionException;
 import ewm.exceptions.ConflictException;
