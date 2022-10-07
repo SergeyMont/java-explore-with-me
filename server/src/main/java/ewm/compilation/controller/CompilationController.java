@@ -1,6 +1,7 @@
 package ewm.compilation.controller;
 
 import ewm.compilation.dto.CompilationDto;
+import ewm.compilation.dto.CompilationShortDto;
 import ewm.compilation.service.CompilationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class CompilationController {
     }
 
     @PostMapping("/admin/compilations")
-    public CompilationDto addNewCompilation(@RequestBody CompilationDto compilationDto) {
+    public CompilationShortDto addNewCompilation(@RequestBody CompilationDto compilationDto) {
         return compilationService.createCompilation(compilationDto);
     }
 

@@ -3,6 +3,7 @@ package ewmstats.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -14,5 +15,5 @@ public class EndpointHit {
     private String app;
     private String uri;
     private String ip;
-    private String timestamp;
+    private LocalDateTime timestamp;
 }

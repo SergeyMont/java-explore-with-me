@@ -2,6 +2,8 @@ package ewm.compilation.service;
 
 import ewm.compilation.Compilation;
 import ewm.compilation.dto.CompilationDto;
+import ewm.compilation.dto.CompilationShortDto;
+import ewm.compilation.dto.Eve;
 import ewm.compilation.repository.CompilationRepository;
 import ewm.exceptions.ObjectNotFoundException;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,8 +37,16 @@ public class CompilationService {
     }
 
     @Transactional
-    public CompilationDto createCompilation(CompilationDto compilationDto) {
-        return toCompilationDto(compilationRepository.save(toCompilation(compilationDto)));
+    public CompilationShortDto createCompilation(CompilationDto compilationDto) {
+        Compilation compilation = compilationRepository.save(toCompilation(compilationDto));
+        CompilationShortDto result = modelMapper.map(compilation, CompilationShortDto.class);
+        List<Integer> list = compilation.getEvents();
+        List<Eve> comp = new ArrayList<>();
+        for (int i : list) {
+            comp.add(new Eve(i));
+        }
+        result.setEvents(comp);
+        return result;
     }
 
     @Transactional

@@ -1,6 +1,5 @@
 package ewm.compilation;
 
-import ewm.event.Event;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +16,6 @@ public class Compilation {
     private int id;
     private boolean pinned;
     private String title;
-    @OneToMany
-    private List<Event> events;
+    @ElementCollection
+    private List<Integer> events;
 }

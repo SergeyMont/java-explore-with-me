@@ -22,6 +22,7 @@ public class Event {
     private int confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
+    @Column(name = "event_date")
     private LocalDateTime eventDate;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +30,8 @@ public class Event {
     @JoinColumn(name = "initiator_id")
     @ManyToOne
     private User initiator;
-    private float lat;
-    private float lon;
+    private Float lat;
+    private Float lon;
     private Boolean paid;
     private Integer participantLimit;
     private LocalDateTime publishedOn;

@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,19 +49,19 @@ public class EventService {
         List<Category> categoryList = categoryRepository.findAllById(categories);
         Pageable pageableDate = PageRequest.of(from, size, JpaSort.unsafe("event_date"));
         Pageable pageableViews = PageRequest.of(from, size, JpaSort.unsafe("views"));
-        LocalDateTime dateStart = LocalDateTime.parse(rangeStart.get());
-        LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd);
+        LocalDateTime dateStart = LocalDateTime.parse(rangeStart.get(), formatter);
+        LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd, formatter);
         List<Event> list = new ArrayList<>();
         switch (sort) {
             case EVENT_DATE:
                 list = eventRepository
                         .findAllEventsCategoryRange(text,
-                                categoryList, dateStart, dateEnd, paid, State.PUBLISHED, pageableDate);
+                                categoryList, dateStart.toString(), dateEnd.toString(), paid, State.PUBLISHED, pageableDate);
                 break;
             case VIEWS:
                 list = eventRepository
                         .findAllEventsCategoryRange(text,
-                                categoryList, dateStart, dateEnd, paid, State.PUBLISHED, pageableViews);
+                                categoryList, rangeStart.orElse(""), rangeEnd, paid, State.PUBLISHED, pageableViews);
                 break;
         }
         return list.stream()
@@ -78,15 +79,20 @@ public class EventService {
     }
 
     private Event setStatisticViews(Event innerEvent) {
-        innerEvent.setViews(((ViewStatsDto) eventClient.getViews(LocalDateTime.MIN.format(formatter),
+        ResponseEntity<Object> responseEntity = eventClient.getViews(
+                LocalDateTime.of(1990, 01, 01, 01, 00).format(formatter),
                 LocalDateTime.now().format(formatter),
-                List.of("/events/{" + innerEvent.getId() + "}"), true).getBody()).getHits());
+                List.of("/events/{" + innerEvent.getId() + "}"), true);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            ViewStatsDto viewStatsDto = modelMapper.map(responseEntity.getBody(), ViewStatsDto.class);
+            innerEvent.setViews(viewStatsDto.getHits());
+        }
         return eventRepository.save(innerEvent);
     }
 
     public List<EventFullDto> getAllEventsByUser(int userId, int from, int size) {
         Pageable pageable = PageRequest.of(from, size);
-        return eventRepository.findAllByInitiator(userId, pageable)
+        return eventRepository.findAllByInitiatorId(userId, pageable)
                 .stream()
                 .map(this::setStatisticViews)
                 .map(this::getEventFullDto)
@@ -95,7 +101,7 @@ public class EventService {
 
     @Transactional
     public EventFullDto updateEventByUser(int userId, UpdateEventRequest updateEventRequest) {
-        Event event = EventMapper.fromUpdateToEvent(updateEventRequest);
+        Event event = modelMapper.map(updateEventRequest, Event.class);
         setCategoryStateInitiator(event, updateEventRequest.getCategory(), userId);
         return getEventFullDto(eventRepository.save(event));
     }
@@ -116,18 +122,23 @@ public class EventService {
     }
 
     private EventFullDto getEventFullDto(Event innerEvent) {
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(innerEvent);
+        EventFullDto eventFullDto = modelMapper.map(innerEvent, EventFullDto.class);
         eventFullDto.setCategory(modelMapper.map(innerEvent.getCategory(), CategoryDto.class));
-        eventFullDto.setEventDate(innerEvent.getEventDate().format(formatter));
-        eventFullDto.setCreatedOn(innerEvent.getCreatedOn().format(formatter));
+        if (eventFullDto.getEventDate() != null)
+            eventFullDto.setEventDate(innerEvent.getEventDate().format(formatter));
+        if (innerEvent.getCreatedOn() != null) eventFullDto.setCreatedOn(innerEvent.getCreatedOn().format(formatter));
         if (innerEvent.getPublishedOn() != null)
             eventFullDto.setPublishedOn(innerEvent.getPublishedOn().format(formatter));
-        eventFullDto.setInitiator(modelMapper.map(innerEvent.getInitiator(), UserShortDto.class));
+        if (innerEvent.getInitiator() != null)
+            eventFullDto.setInitiator(modelMapper.map(innerEvent.getInitiator(), UserShortDto.class));
+        if (innerEvent.getLat() != null || innerEvent.getLon() != null) {
+            eventFullDto.setLocation(new Location(innerEvent.getLat(), innerEvent.getLon()));
+        }
         return eventFullDto;
     }
 
     public EventFullDto getEventByUser(int userId, int eventId) {
-        return getEventFullDto(setStatisticViews(eventRepository.findEventByIdAndInitiator(eventId, userId)));
+        return getEventFullDto(setStatisticViews(eventRepository.findEventByIdAndInitiatorId(eventId, userId)));
     }
 
     public List<EventFullDto> searchEventByAdmin(List<Integer> users,
@@ -149,8 +160,9 @@ public class EventService {
 
     @Transactional
     public EventFullDto updateEventByAdmin(int eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
-        Event event = EventMapper.fromAdminToEvent(adminUpdateEventRequest);
+        Event event = modelMapper.map(adminUpdateEventRequest, Event.class);
         event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory()).get());
+        event.setEventDate(LocalDateTime.parse(adminUpdateEventRequest.getEventDate(), formatter));
         return getEventFullDto(eventRepository.save(event));
     }
 
