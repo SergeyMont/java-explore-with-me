@@ -10,23 +10,30 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/events")
 public class RatingController {
     private final RatingService ratingService;
 
-    @PostMapping("/users/rating")
+    @PostMapping("/{eventId}/rate")
     public EventRating createRating(@RequestParam int userId,
-                                    @RequestParam int eventId,
+                                    @PathVariable int eventId,
+                                    @RequestParam int rating) {
+        return ratingService.saveRating(userId, eventId, rating);
+    }
+    @PutMapping("/{eventId}/rate")
+    public EventRating updateRating(@RequestParam int userId,
+                                    @PathVariable int eventId,
                                     @RequestParam int rating) {
         return ratingService.saveRating(userId, eventId, rating);
     }
 
-    @DeleteMapping("/users/rating")
+    @DeleteMapping("/{eventId}/rate")
     public void deleteRating(@RequestParam int userId,
-                             @RequestParam int eventId) {
+                             @PathVariable int eventId) {
         ratingService.deleteRating(userId, eventId);
     }
 
-    @GetMapping("users/rating")
+    @GetMapping("/users/rate")
     public List<UserShortDto> getUsersRating() {
         return ratingService.getUsersByRating();
     }

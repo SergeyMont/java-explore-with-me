@@ -5,6 +5,7 @@ import ewm.event.EventRatingKey;
 import ewm.event.repository.EventRepository;
 import ewm.event.repository.RatingRepository;
 import ewm.exceptions.BadConditionException;
+import ewm.exceptions.ObjectNotFoundException;
 import ewm.user.dto.UserShortDto;
 import ewm.user.repository.UserRepository;
 import ewm.user.service.UserService;
@@ -26,8 +27,8 @@ public class RatingService {
         if (rating < 0 || rating > 10) throw new BadConditionException("Рейтинг должен быть от 0 до 10");
         EventRating eventRating = new EventRating(
                 new EventRatingKey(eventId, userId),
-                eventRepository.findById(eventId).get(),
-                userRepository.findById(userId).get(),
+                eventRepository.findById(eventId).orElseThrow(()->new ObjectNotFoundException("Event not found")),
+                userRepository.findById(userId).orElseThrow(()->new ObjectNotFoundException("User not found")),
                 rating
         );
         return ratingRepository.save(eventRating);
