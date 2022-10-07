@@ -41,7 +41,8 @@ public class RequestService {
         if (!userService.isUserCreated(userId)) throw new ObjectNotFoundException("Пользователь не найден");
         if (Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ConflictException("Создатель мероприятия не может быть участником");
-        } else if (!Objects.equals(event.getState(), State.PUBLISHED.toString())) {
+        }
+        if (event.getState() == State.PUBLISHED) {
             throw new BadConditionException("Событие уже опубликовано!");
         }
         if (event.getParticipantLimit() == event.getConfirmedRequests()) {
