@@ -47,7 +47,7 @@ public class EventService {
                                           int from,
                                           int size) {
         List<Category> categoryList = categoryRepository.findAllById(categories);
-        Pageable pageableDate = PageRequest.of(from, size, JpaSort.unsafe("event_date"));
+        Pageable pageableDate = PageRequest.of(from, size, JpaSort.unsafe("eventDate"));
         Pageable pageableViews = PageRequest.of(from, size, JpaSort.unsafe("views"));
         LocalDateTime dateStart = LocalDateTime.parse(rangeStart.get(), formatter);
         LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd, formatter);
@@ -56,12 +56,12 @@ public class EventService {
             case EVENT_DATE:
                 list = eventRepository
                         .findAllEventsCategoryRange(text,
-                                categoryList, dateStart.toString(), dateEnd.toString(), paid, State.PUBLISHED, pageableDate);
+                                categoryList, dateStart, dateEnd, paid, State.PENDING, pageableDate);
                 break;
             case VIEWS:
                 list = eventRepository
                         .findAllEventsCategoryRange(text,
-                                categoryList, rangeStart.orElse(""), rangeEnd, paid, State.PUBLISHED, pageableViews);
+                                categoryList, dateStart, dateEnd, paid, State.PENDING, pageableViews);
                 break;
         }
         return list.stream()
@@ -103,7 +103,15 @@ public class EventService {
     public EventFullDto updateEventByUser(int userId, UpdateEventRequest updateEventRequest) {
         Event event = modelMapper.map(updateEventRequest, Event.class);
         setCategoryStateInitiator(event, updateEventRequest.getCategory(), userId);
+        event.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), formatter));
         return getEventFullDto(eventRepository.save(event));
+    }
+
+    public EventFullDto cancelEventByUser(int userId, int eventId) {
+        Event innerEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ObjectNotFoundException("Event not found"));
+        innerEvent.setState(State.CANCELED);
+        return getEventFullDto(eventRepository.save(innerEvent));
     }
 
     private void setCategoryStateInitiator(Event event, int updateEventRequest, int userId) {

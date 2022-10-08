@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class RequestService {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Transactional
     public Request createRequest(int userId, int eventId) {
@@ -42,10 +44,10 @@ public class RequestService {
         if (Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ConflictException("Создатель мероприятия не может быть участником");
         }
-        if (event.getState() == State.PUBLISHED) {
+        if (event.getState() != State.PUBLISHED) {
             throw new BadConditionException("Событие уже опубликовано!");
         }
-        if (event.getParticipantLimit() == event.getConfirmedRequests()) {
+        if (event.getParticipantLimit() < event.getConfirmedRequests()) {
             throw new AccessException("Количество подтвержденных участников - максимальное");
         }
         Request request = new Request();
@@ -72,7 +74,7 @@ public class RequestService {
     }
 
     public List<ParticipationRequestDto> getAllByUserEvent(int userId, int eventId) {
-        return repository.findAllByRequesterIdAndEventId(userId, eventId).stream()
+        return repository.findAllByEventId(eventId).stream()
                 .map(this::toRequestDto)
                 .collect(Collectors.toList());
     }
@@ -84,12 +86,12 @@ public class RequestService {
         if (event.getConfirmedRequests() < event.getParticipantLimit()) {
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             if (event.getConfirmedRequests() == event.getParticipantLimit()) {
-                for (Request cancelEvent : repository.findAllByRequesterIdAndEventId(userId, eventId)) {
-                    cancelEvent.setStatus(Status.CANCELED);
+                for (Request cancelEvent : repository.findAllByEventId(eventId)) {
+                    cancelEvent.setStatus(Status.REJECTED);
                 }
             }
             Request request = repository.findById(reqId).orElseThrow(() -> new ObjectNotFoundException("Запрос не найден"));
-            request.setStatus(Status.APPROVED);
+            request.setStatus(Status.CONFIRMED);
             repository.save(request);
             return toRequestDto(request);
         } else throw new AccessException("Достигнуто максимальное количество участников мероприятия");
@@ -102,7 +104,7 @@ public class RequestService {
         eventRepository.findById(eventId).orElseThrow();
         if (repository.findById(reqId).isPresent()) {
             request = repository.findById(reqId).get();
-            request.setStatus(Status.CANCELED);
+            request.setStatus(Status.REJECTED);
             repository.save(request);
         } else {
             throw new ObjectNotFoundException("Запрос не найден");
@@ -118,6 +120,12 @@ public class RequestService {
     }
 
     private ParticipationRequestDto toRequestDto(Request request) {
-        return modelMapper.map(request, ParticipationRequestDto.class);
+        ParticipationRequestDto dto = new ParticipationRequestDto();
+        dto.setRequester(request.getId());
+        dto.setCreated(request.getCreated().format(formatter));
+        dto.setStatus(request.getStatus().name());
+        dto.setEvent(request.getId());
+        dto.setId(request.getId());
+        return dto;
     }
 }

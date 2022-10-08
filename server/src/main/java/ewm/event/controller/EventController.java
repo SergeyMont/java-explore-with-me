@@ -82,9 +82,8 @@ public class EventController {
 
     @PatchMapping("/users/{userId}/events/{eventId}")
     public EventFullDto cancelEvent(@PathVariable int userId,
-                                    @PathVariable int eventId,
-                                    @RequestBody UpdateEventRequest updateEventRequest) {
-        return eventService.updateEventByUser(userId, updateEventRequest);
+                                    @PathVariable int eventId) {
+        return eventService.cancelEventByUser(userId, eventId);
     }
 
     @GetMapping("/admin/events")

@@ -16,8 +16,8 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             " and e.paid = :paid and e.state = :state ")
     List<Event> findAllEventsCategoryRange(String text,
                                            List<Category> category,
-                                           String rangeStart,
-                                           String rangeEnd,
+                                           LocalDateTime rangeStart,
+                                           LocalDateTime rangeEnd,
                                            boolean paid,
                                            State state,
                                            Pageable pageable);
