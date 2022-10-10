@@ -30,11 +30,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public List<UserShortDto> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::toUserShortDto)
-                .collect(Collectors.toList());
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public List<UserDto> searchByIds(List<Integer> list, int from, int size) {

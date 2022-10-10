@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class EventRating {
     @EmbeddedId
     EventRatingKey id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("eventId")
     @JoinColumn(name = "event_id")
     private Event event;

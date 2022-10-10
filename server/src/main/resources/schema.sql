@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS compilation_events (
     user_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
     rating BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (event_id) REFERENCES films (event_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, event_id)
     );

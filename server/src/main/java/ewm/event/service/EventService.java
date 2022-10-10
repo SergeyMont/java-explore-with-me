@@ -4,6 +4,7 @@ import ewm.category.Category;
 import ewm.category.dto.CategoryDto;
 import ewm.category.repository.CategoryRepository;
 import ewm.event.Event;
+import ewm.event.EventRating;
 import ewm.event.State;
 import ewm.event.controller.Sort;
 import ewm.event.dto.*;
@@ -49,6 +50,7 @@ public class EventService {
         List<Category> categoryList = categoryRepository.findAllById(categories);
         Pageable pageableDate = PageRequest.of(from, size, JpaSort.unsafe("eventDate"));
         Pageable pageableViews = PageRequest.of(from, size, JpaSort.unsafe("views"));
+        Pageable pageableRating = PageRequest.of(from, size, JpaSort.unsafe("ratings"));
         LocalDateTime dateStart = LocalDateTime.parse(rangeStart.get(), formatter);
         LocalDateTime dateEnd = LocalDateTime.parse(rangeEnd, formatter);
         List<Event> list = new ArrayList<>();
@@ -62,6 +64,11 @@ public class EventService {
                 list = eventRepository
                         .findAllEventsCategoryRange(text,
                                 categoryList, dateStart, dateEnd, paid, State.PENDING, pageableViews);
+                break;
+            case RATING:
+                list = eventRepository
+                        .findAllEventsCategoryRange(text,
+                                categoryList, dateStart, dateEnd, paid, State.PENDING, pageableRating);
                 break;
         }
         return list.stream()
@@ -141,6 +148,16 @@ public class EventService {
             eventFullDto.setInitiator(modelMapper.map(innerEvent.getInitiator(), UserShortDto.class));
         if (innerEvent.getLat() != null || innerEvent.getLon() != null) {
             eventFullDto.setLocation(new Location(innerEvent.getLat(), innerEvent.getLon()));
+        }
+        if (innerEvent.getRating() != null) {
+            double rating;
+            int sum = 0;
+            List<EventRating> list = innerEvent.getRating();
+            for (EventRating eventRating : list) {
+                sum += eventRating.getRating();
+            }
+            rating = (double) sum / list.size();
+            eventFullDto.setRating(rating);
         }
         return eventFullDto;
     }
