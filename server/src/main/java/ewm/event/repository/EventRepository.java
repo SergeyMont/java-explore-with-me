@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
-    @Query("select e from Event e where lower(e.annotation) like lower(:text)  or lower(e.description)  like lower(:text) " +
+    @Query("select e from Event e where lower(e.annotation) like concat('%',lower(:text),'%')" +
+            " or lower(e.description)  like concat('%',lower(:text),'%') " +
             " and e.category in :category and e.eventDate between :rangeStart and :rangeEnd" +
             " and e.paid = :paid and e.state = :state ")
     List<Event> findAllEventsCategoryRange(String text,

@@ -1,7 +1,7 @@
 package ewm.request.controller;
 
-import ewm.request.Request;
 import ewm.request.dto.ParticipationRequestDto;
+import ewm.request.dto.RequestEventDto;
 import ewm.request.service.RequestService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +20,8 @@ public class RequestController {
     }
 
     @PostMapping("/{userId}/requests")
-    public Request createRequest(@PathVariable Integer userId,
-                                 @RequestParam Integer eventId) {
+    public RequestEventDto createRequest(@PathVariable Integer userId,
+                                         @RequestParam Integer eventId) {
         return requestService.createRequest(userId, eventId);
     }
 
@@ -32,8 +32,8 @@ public class RequestController {
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> getAllByUserAndEvent(@PathVariable Integer userId,
-                                                              @PathVariable Integer eventId) {
+    public List<RequestEventDto> getAllByUserAndEvent(@PathVariable Integer userId,
+                                                      @PathVariable Integer eventId) {
         return requestService.getAllByUserEvent(userId, eventId);
     }
 

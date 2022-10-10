@@ -56,7 +56,7 @@ public class EventService {
             case EVENT_DATE:
                 list = eventRepository
                         .findAllEventsCategoryRange(text,
-                                categoryList, dateStart, dateEnd, paid, State.PENDING, pageableDate);
+                                categoryList, dateStart, dateEnd, paid, State.PUBLISHED, pageableDate);
                 break;
             case VIEWS:
                 list = eventRepository
@@ -129,7 +129,7 @@ public class EventService {
         return getEventFullDto(eventRepository.save(event));
     }
 
-    private EventFullDto getEventFullDto(Event innerEvent) {
+    public EventFullDto getEventFullDto(Event innerEvent) {
         EventFullDto eventFullDto = modelMapper.map(innerEvent, EventFullDto.class);
         eventFullDto.setCategory(modelMapper.map(innerEvent.getCategory(), CategoryDto.class));
         if (eventFullDto.getEventDate() != null)
