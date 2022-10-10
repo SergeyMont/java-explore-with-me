@@ -20,6 +20,7 @@ public class RatingController {
                                     @RequestParam int rating) {
         return ratingService.saveRating(userId, eventId, rating);
     }
+
     @PutMapping("/{eventId}/rate")
     public EventRating updateRating(@RequestParam int userId,
                                     @PathVariable int eventId,
