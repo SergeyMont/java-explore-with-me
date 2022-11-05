@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -40,4 +41,6 @@ public class Event {
     private State state;
     private String title;
     private Integer views;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
+    private List<EventRating> rating;
 }
