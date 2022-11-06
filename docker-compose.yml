@@ -12,6 +12,8 @@ services:
       - SERVER-PORT=9090
     depends_on:
       - stats_db
+      - zookeeper
+      - kafka
 
   stats_db:
     image: postgres:14-alpine
@@ -38,6 +40,8 @@ services:
     depends_on:
       - ewm_db
       - stats-server
+      - zookeeper
+      - kafka
 
   ewm_db:
     image: postgres:14-alpine
@@ -48,3 +52,22 @@ services:
       - POSTGRES_DB=ewm_db
       - POSTGRES_USER=ewm
       - POSTGRES_PASSWORD=password
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+      image: 'bitnami/kafka:latest'
+      ports:
+        - '9092:9092'
+      environment:
+        - KAFKA_BROKER_ID=1
+        - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+        - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+        - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+        - ALLOW_PLAINTEXT_LISTENER=yes
+      depends_on:
+        - zookeeper

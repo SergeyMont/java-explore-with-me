@@ -3,6 +3,7 @@ package ewmstats.server;
 import ewmstats.model.EndpointHit;
 import ewmstats.model.ViewStats;
 import lombok.AllArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,13 @@ public class StatsController {
 
     @PostMapping("/hit")
     public void saveHit(@RequestBody EndpointHit endpointHit) {
+        statsService.saveHit(endpointHit);
+    }
+
+    @KafkaListener(
+            topics = "clicks",
+            containerFactory = "kafkaListenerContainerFactory")
+    public void greetingListener(EndpointHit endpointHit) {
         statsService.saveHit(endpointHit);
     }
 }

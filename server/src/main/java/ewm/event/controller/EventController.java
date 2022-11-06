@@ -1,5 +1,6 @@
 package ewm.event.controller;
 
+import ewm.event.client.Producer;
 import ewm.event.dto.*;
 import ewm.event.service.EventClient;
 import ewm.event.service.EventService;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class EventController {
     private final EventService eventService;
     private final EventClient eventClient;
+    private final Producer producer;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping("/events")
@@ -43,7 +45,8 @@ public class EventController {
         endpointHit.setApp("ewm-server");
         endpointHit.setIp(request.getRemoteAddr());
         endpointHit.setTimestamp(LocalDateTime.now().format(formatter));
-        eventClient.saveHit(endpointHit);
+        //eventClient.saveHit(endpointHit);
+        producer.sendMessage(endpointHit);
     }
 
     @GetMapping("/events/{id}")
