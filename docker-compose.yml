@@ -13,7 +13,7 @@ services:
     depends_on:
       - stats_db
       - zookeeper
-      - kafka
+      - broker
 
   stats_db:
     image: postgres:14-alpine
@@ -41,7 +41,7 @@ services:
       - ewm_db
       - stats-server
       - zookeeper
-      - kafka
+      - broker
 
   ewm_db:
     image: postgres:14-alpine
@@ -54,20 +54,34 @@ services:
       - POSTGRES_PASSWORD=password
 
   zookeeper:
-    image: 'bitnami/zookeeper:latest'
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper
+    user: "0:0"
     ports:
-      - '2181:2181'
+      - "2181:2181"
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-  kafka:
-      image: 'bitnami/kafka:latest'
-      ports:
-        - '9092:9092'
-      environment:
-        - KAFKA_BROKER_ID=1
-        - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-        - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
-        - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-        - ALLOW_PLAINTEXT_LISTENER=yes
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - ./zoo/data:/var/lib/zookeeper/data
+      - ./zoo/log:/var/lib/zookeeper/log
+
+  broker:
+      image: confluentinc/cp-kafka:latest
+      hostname: broker
+      container_name: broker
+      user: "0:0"
       depends_on:
         - zookeeper
+      ports:
+        - "9092:9092"
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      volumes:
+        - ./broker/data:/var/lib/kafka/data
