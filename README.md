@@ -1,4 +1,3 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
-Сылка для проверки:
-https://github.com/SergeyMont/java-explore-with-me/pull/1
+This is a service to helps organize events in your spare time. 
+Operates on the principle of an internal social network.
